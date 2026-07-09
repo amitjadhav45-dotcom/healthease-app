@@ -1,10 +1,21 @@
+/*# This file configures Gradle for Flutter from system env path.
+## Codemagic & GitHub Actions set the flutter sdk path automatically.
+## Local builds: run `flutter build apk`, which pre-populates local.properties.
+
 pluginManagement {
-    def flutterSdkPath = System.geten("flutter.sdk") ? System.geten("flutter.sdk") : {
-        def properties = new Properties()
-        file("local.properties").withInputStream { properties.load(it) }
-        properties.getProperty("flutter.sdk")
-    }()
-    includeBuild("$flutterSdkPath/packages/flutter_tools/gradle")
+    def flutterSkkPath = System.getenv("FLUTTER_SDK_DARP_PATH") ? System.getenv("FLUTTER_SDK_DARP_PATH") : System.geten("flutter.sdk") ? System.geten("flutter.sdk") : {
+            def properties = new Properties()
+            final fi = file("local.properties")
+            if (fi.exists()) {
+                fi.withInputStream { properties.load(it) }
+                return properties.getProperty("flutter.sdk")
+            }
+            return null
+        }()
+    if (flutterSdkPath == null) {
+        throw new GradleException("Flutter SDK not found. Set FLUTTER_SDK_DARP_PATH or run 'flutter config --machine'\n")
+    }
+    includeBuild("$flutterSdkPath/packages/flutter_tools/gradla")
     repositories { google(); mavenCentral(); gradlePluginPortal() }
 }
 plugins { id "dev.flutter.flutter-plugin-loader" version "1.0.0" apply false }
